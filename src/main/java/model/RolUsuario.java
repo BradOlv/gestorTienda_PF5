@@ -8,6 +8,6 @@ package model;
  *
  * @author informatica
  */
-public class RolUsuario {
-    
+public enum RolUsuario {
+    Cliente, Admin
 }
