@@ -5,7 +5,7 @@
     version="4.0">
     
     <welcome-file-list>
-        <welcome-file>pages/menuPrincipal.jsp</welcome-file>
+        <welcome-file>pages/administracionUsuarios.jsp</welcome-file>
     </welcome-file-list>
     <session-config>
         <session-timeout>

@@ -1,0 +1,9 @@
+web\ServletClientes.class
+dao\VentasDAO.class
+web\ServletUsuarios.class
+dao\ClientesDAO.class
+model\Venta.class
+model\Cliente.class
+dao\UsuariosDAO.class
+model\Usuario.class
+web\ServletVentas.class
