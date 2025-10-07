@@ -61,13 +61,14 @@
     
     <body>
         
+        <%-- Define variables JSP para el título y la acción del servlet --%>
         <c:set var="titulo" value="${usuario.idUsuario > 0 ? 'Editar Usuario' : 'Agregar Nuevo Usuario'}"/>
         <c:set var="accion" value="${usuario.idUsuario > 0 ? 'actualizar' : 'agregar'}"/>
 
         <div class="titulo-bg">
             <div class="container d-flex justify-content-between align-items-center">
-                 <h2 class="my-3 text-white" style="font-family: var(--font-georgia);">${titulo}</h2>
-                <a href="UsuarioServlet?accion=listar" class="btn btn-sm btn-outline-light" style="font-family: var(--font-georgia); border-radius: 8px;">Cancelar / Volver a Listado</a>
+                   <h2 class="my-3 text-white" style="font-family: var(--font-georgia);">${titulo}</h2>
+                 <a href="UsuarioServlet?accion=listar" class="btn btn-sm btn-outline-light" style="font-family: var(--font-georgia); border-radius: 8px;">Cancelar / Volver a Listado</a>
             </div>
         </div>
 
@@ -122,6 +123,22 @@
                                     <input type="text" class="form-control form-control-custom" id="direccionUsuario" 
                                            name="direccionUsuario" value="${usuario.direccionUsuario}" maxlength="255">
                                 </div>
+                                
+                                <%-- NIT (Campo Adicional) --%>
+                                <div class="mb-3">
+                                    <label for="nit" class="form-label texto-principal">NIT</label>
+                                    <input type="text" class="form-control form-control-custom" id="nit" 
+                                           name="nit" value="${usuario.nit}" required maxlength="64">
+                                </div>
+
+                                <%-- Rol (Campo Adicional - Select) --%>
+                                <div class="mb-3">
+                                    <label for="rol" class="form-label texto-principal">Rol</label>
+                                    <select class="form-select form-control-custom" id="rol" name="rol" required>
+                                        <option value="Cliente" ${usuario.rol == 'Cliente' ? 'selected' : ''}>Cliente</option>
+                                        <option value="Admin" ${usuario.rol == 'Admin' ? 'selected' : ''}>Admin</option>
+                                    </select>
+                                </div>
 
                                 <%-- Contraseña (Requerida al agregar, opcional al editar) --%>
                                 <div class="mb-4">
@@ -134,10 +151,7 @@
 
                                 <div class="d-flex justify-content-end">
                                     <button type="submit" class="btn btn-custom-primary">
-                                        <c:choose>
-                                            <c:when test="${usuario.idUsuario > 0}">Actualizar Usuario</c:when>
-                                            <c:otherwise>Guardar Usuario</c:otherwise>
-                                        </c:choose>
+                                        <c:choose><c:when test="${usuario.idUsuario > 0}">Actualizar Usuario</c:when><c:otherwise>Guardar Usuario</c:otherwise></c:choose>
                                     </button>
                                 </div>
                             </form>

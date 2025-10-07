@@ -48,41 +48,46 @@ public class Usuario implements Serializable {
     @Column(name = "contrasena", nullable = false, length = 255)
     private String contrasena;
     
-    // NUEVOS CAMPOS AGREGADOS
-    @Column(name = "nit", nullable = false)
+    // CAMPOS NIT Y ROL AGREGADOS
+    // Se ha ajustado la longitud del NIT a 64 para ser consistente con el JSP
+    @Column(name = "nit", nullable = false, length = 64) 
     private String nit;
     
     @Column(name = "rol", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private RolUsuario rol = RolUsuario.Cliente;
+    @Enumerated(EnumType.STRING) // Mapeo correcto para Enum
+    private RolUsuario rol = RolUsuario.Cliente; // Valor por defecto
 
+    /**
+     * Constructor vacío requerido por JPA.
+     */
     public Usuario() {
     }
 
-    public Usuario(String nombreUsuario, String apellidoUsuario, String emailUsuario, String telefonoUsuario, String direccionUsuario, String contrasena) {
+    /**
+     * Constructor para AGREGAR NUEVOS USUARIOS desde el Servlet.
+     * Este constructor tiene 8 argumentos (sin idUsuario ni fechaRegistro, ya que se generan).
+     */
+    public Usuario(String nombreUsuario, String apellidoUsuario, String emailUsuario, 
+                   String telefonoUsuario, String direccionUsuario, String contrasena,
+                   String nit, RolUsuario rol) {
         this.nombreUsuario = nombreUsuario;
         this.apellidoUsuario = apellidoUsuario;
         this.emailUsuario = emailUsuario;
         this.telefonoUsuario = telefonoUsuario;
         this.direccionUsuario = direccionUsuario;
-        this.contrasena = contrasena;
-        this.fechaRegistro = new Date();
-        this.rol = RolUsuario.Cliente;
-    }
-
-    public Usuario(int idUsuario, String nombreUsuario, String apellidoUsuario, String emailUsuario, String telefonoUsuario, String direccionUsuario, Date fechaRegistro, String contrasena, String nit) {
-        this.idUsuario = idUsuario;
-        this.nombreUsuario = nombreUsuario;
-        this.apellidoUsuario = apellidoUsuario;
-        this.emailUsuario = emailUsuario;
-        this.telefonoUsuario = telefonoUsuario;
-        this.direccionUsuario = direccionUsuario;
-        this.fechaRegistro = fechaRegistro;
         this.contrasena = contrasena;
         this.nit = nit;
+        this.rol = rol;
+        this.fechaRegistro = new Date(); // Establecer la fecha aquí o dejar que el DAO lo haga
     }
     
-        public Usuario(int idUsuario, String nombreUsuario, String apellidoUsuario, String emailUsuario, String telefonoUsuario, String direccionUsuario, Date fechaRegistro, String contrasena, String nit, RolUsuario rol) {
+    /**
+     * Constructor completo para obtener o cargar usuarios.
+     * Este constructor tiene 10 argumentos.
+     */
+    public Usuario(int idUsuario, String nombreUsuario, String apellidoUsuario, String emailUsuario, 
+                   String telefonoUsuario, String direccionUsuario, Date fechaRegistro, 
+                   String contrasena, String nit, RolUsuario rol) {
         this.idUsuario = idUsuario;
         this.nombreUsuario = nombreUsuario;
         this.apellidoUsuario = apellidoUsuario;
@@ -94,8 +99,8 @@ public class Usuario implements Serializable {
         this.nit = nit;
         this.rol = rol;
     }
-    
-    
+
+    // El constructor de 6 argumentos fue eliminado ya que es obsoleto al añadir nit y rol.
 
     // --- Getters y Setters ---
 
@@ -178,8 +183,6 @@ public class Usuario implements Serializable {
     public void setRol(RolUsuario rol) {
         this.rol = rol;
     }
-    
-    
 
     @Override
     public String toString() {
