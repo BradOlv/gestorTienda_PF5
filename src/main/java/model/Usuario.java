@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -45,6 +47,14 @@ public class Usuario implements Serializable {
     
     @Column(name = "contrasena", nullable = false, length = 255)
     private String contrasena;
+    
+    // NUEVOS CAMPOS AGREGADOS
+    @Column(name = "nit", nullable = false)
+    private String nit;
+    
+    @Column(name = "rol", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RolUsuario rol = RolUsuario.Cliente;
 
     public Usuario() {
     }
@@ -56,8 +66,36 @@ public class Usuario implements Serializable {
         this.telefonoUsuario = telefonoUsuario;
         this.direccionUsuario = direccionUsuario;
         this.contrasena = contrasena;
-        this.fechaRegistro = new Date(); 
+        this.fechaRegistro = new Date();
+        this.rol = RolUsuario.Cliente;
     }
+
+    public Usuario(int idUsuario, String nombreUsuario, String apellidoUsuario, String emailUsuario, String telefonoUsuario, String direccionUsuario, Date fechaRegistro, String contrasena, String nit) {
+        this.idUsuario = idUsuario;
+        this.nombreUsuario = nombreUsuario;
+        this.apellidoUsuario = apellidoUsuario;
+        this.emailUsuario = emailUsuario;
+        this.telefonoUsuario = telefonoUsuario;
+        this.direccionUsuario = direccionUsuario;
+        this.fechaRegistro = fechaRegistro;
+        this.contrasena = contrasena;
+        this.nit = nit;
+    }
+    
+        public Usuario(int idUsuario, String nombreUsuario, String apellidoUsuario, String emailUsuario, String telefonoUsuario, String direccionUsuario, Date fechaRegistro, String contrasena, String nit, RolUsuario rol) {
+        this.idUsuario = idUsuario;
+        this.nombreUsuario = nombreUsuario;
+        this.apellidoUsuario = apellidoUsuario;
+        this.emailUsuario = emailUsuario;
+        this.telefonoUsuario = telefonoUsuario;
+        this.direccionUsuario = direccionUsuario;
+        this.fechaRegistro = fechaRegistro;
+        this.contrasena = contrasena;
+        this.nit = nit;
+        this.rol = rol;
+    }
+    
+    
 
     // --- Getters y Setters ---
 
@@ -124,6 +162,24 @@ public class Usuario implements Serializable {
     public void setContrasena(String contrasena) {
         this.contrasena = contrasena;
     }
+
+    public String getNit() {
+        return nit;
+    }
+
+    public void setNit(String nit) {
+        this.nit = nit;
+    }
+
+    public RolUsuario getRol() {
+        return rol;
+    }
+
+    public void setRol(RolUsuario rol) {
+        this.rol = rol;
+    }
+    
+    
 
     @Override
     public String toString() {
