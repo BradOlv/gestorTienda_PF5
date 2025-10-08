@@ -77,80 +77,80 @@
         </style>
     </head>
     
-     <body>
-        <div class="titulo-bg">
-            <div class="container d-flex justify-content-between align-items-center">
-                <h2 class="my-3 text-white" style="font-family: var(--font-georgia);">Administración de Usuarios</h2>
-                <%-- Se asume que menuPrincipal.jsp está en la carpeta "pages" --%>
-                <a href="pages/menuPrincipal.jsp" class="btn btn-sm btn-outline-light" style="font-family: var(--font-georgia); border-radius: 8px;">Volver al Menú</a>
-            </div>
-        </div>
+      <body>
+        <div class="titulo-bg">
+            <div class="container d-flex justify-content-between align-items-center">
+                <h2 class="my-3 text-white" style="font-family: var(--font-georgia);">Administración de Usuarios</h2>
+                <%-- Se asume que menuPrincipal.jsp está en la carpeta "pages" --%>
+                <a href="pages/menuPrincipal.jsp" class="btn btn-sm btn-outline-light" style="font-family: var(--font-georgia); border-radius: 8px;">Volver al Menú</a>
+            </div>
+        </div>
 
-        <div class="container my-5">
-            <div class="row mb-4">
-                <div class="col-md-12">
-                    <%-- Enlace que llama al Servlet con acción 'editar' e id=0 para mostrar el formulario vacío (Agregar) --%>
-                    <a href="UsuarioServlet?accion=editar&id=0" class="btn btn-custom-primary">
-                        Agregar Nuevo Usuario
-                    </a>
-                </div>
-            </div>
+        <div class="container my-5">
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <%-- Enlace que llama al Servlet con acción 'editar' e id=0 para mostrar el formulario vacío (Agregar) --%>
+                    <a href="UsuarioServlet?accion=editar&id=0" class="btn btn-custom-primary">
+                        Agregar Nuevo Usuario
+                    </a>
+                </div>
+            </div>
 
-            <%-- TABLA DE USUARIOS --%>
-            <div class="table-responsive">
-                <table class="table table-custom align-middle">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Apellido</th>
-                            <th>Email</th>
-                            <th>Teléfono</th>
-                            <th>Dirección</th>
-                            <th>Registro</th>
-                            <th class="text-center">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <%-- Itera sobre la lista de Usuarios enviada desde ServletUsuarios --%>
-                        <c:forEach var="usuario" items="${listaUsuarios}">
-                            <tr>
-                                <td class="texto-principal">${usuario.idUsuario}</td>
-                                <td class="texto-principal">${usuario.nombreUsuario}</td>
-                                <td class="texto-principal">${usuario.apellidoUsuario}</td>
-                                <td class="texto-principal">${usuario.emailUsuario}</td>
-                                <td class="texto-principal">${usuario.telefonoUsuario}</td>
-                                <td class="texto-principal">${usuario.direccionUsuario}</td>
-                                <td class="texto-principal">
-                                    <fmt:formatDate value="${usuario.fechaRegistro}" pattern="dd/MM/yyyy HH:mm"/>
-                                </td>
-                                <td class="text-center">
-                                    <%-- Botón Editar: Llama al formularioEditar del Servlet --%>
-                                    <a href="UsuarioServlet?accion=editar&id=${usuario.idUsuario}" class="btn btn-custom-primary btn-sm">
-                                        Editar
-                                    </a>
-                                    <%-- Botón Eliminar: Llama a eliminarUsuario del Servlet --%>
-                                    <a href="UsuarioServlet?accion=eliminar&id=${usuario.idUsuario}" 
-                                       onclick="return confirm('¿Está seguro de eliminar a ${usuario.nombreUsuario} ${usuario.apellidoUsuario}?')" 
-                                       class="btn btn-sm btn-danger">
-                                        Eliminar
-                                    </a>
-                                </td>
-                            </tr>
-                        </c:forEach>
-                    </tbody>
-                </table>
-            </div>
+            <%-- TABLA DE USUARIOS --%>
+            <div class="table-responsive">
+                <table class="table table-custom align-middle">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Dirección</th>
+                            <th>Registro</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <%-- Itera sobre la lista de Usuarios enviada desde ServletUsuarios --%>
+                        <c:forEach var="usuario" items="${listaUsuarios}">
+                            <tr>
+                                <td class="texto-principal">${usuario.idUsuario}</td>
+                                <td class="texto-principal">${usuario.nombreUsuario}</td>
+                                <td class="texto-principal">${usuario.apellidoUsuario}</td>
+                                <td class="texto-principal">${usuario.emailUsuario}</td>
+                                <td class="texto-principal">${usuario.telefonoUsuario}</td>
+                                <td class="texto-principal">${usuario.direccionUsuario}</td>
+                                <td class="texto-principal">
+                                    <fmt:formatDate value="${usuario.fechaRegistro}" pattern="dd/MM/yyyy HH:mm"/>
+                                </td>
+                                <td class="text-center">
+                                    <%-- Botón Editar: Llama al formularioEditar del Servlet --%>
+                                    <a href="UsuarioServlet?accion=editar&id=${usuario.idUsuario}" class="btn btn-custom-primary btn-sm">
+                                        Editar
+                                    </a>
+                                    <%-- Botón Eliminar: Llama a eliminarUsuario del Servlet --%>
+                                    <a href="UsuarioServlet?accion=eliminar&id=${usuario.idUsuario}" 
+                                       onclick="return confirm('¿Está seguro de eliminar a ${usuario.nombreUsuario} ${usuario.apellidoUsuario}?')" 
+                                       class="btn btn-sm btn-danger">
+                                        Eliminar
+                                    </a>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                    </tbody>
+                </table>
+            </div>
 
-            <%-- Mensaje si no hay usuarios --%>
-            <c:if test="${empty listaUsuarios}">
-                <div class="alert alert-info mt-3" role="alert">
-                    No hay usuarios registrados en la base de datos.
-                </div>
-            </c:if>
+            <%-- Mensaje si no hay usuarios --%>
+            <c:if test="${empty listaUsuarios}">
+                <div class="alert alert-info mt-3" role="alert">
+                    No hay usuarios registrados en la base de datos.
+                </div>
+            </c:if>
 
-        </div>
-        
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-    </body>
+        </div>
+        
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    </body>
 </html>
