@@ -44,7 +44,23 @@ public class DetalleVentaDAO {
         EntityManager em = null;
         try {
             em = EMF.createEntityManager();
-            return em.find(DetalleVenta.class, id);
+            DetalleVenta detalle = em.find(DetalleVenta.class, id);
+            // Inicializar las relaciones lazy antes de cerrar el EntityManager
+            if (detalle != null) {
+                if (detalle.getVenta() != null) {
+                    detalle.getVenta().getIdVenta();
+                    if (detalle.getVenta().getCliente() != null) {
+                        detalle.getVenta().getCliente().getNombreCliente();
+                    }
+                    if (detalle.getVenta().getUsuario() != null) {
+                        detalle.getVenta().getUsuario().getNombreUsuario();
+                    }
+                }
+                if (detalle.getProducto() != null) {
+                    detalle.getProducto().getNombreProducto();
+                }
+            }
+            return detalle;
         } catch (Exception e) {
             System.err.println("Error al buscar detalle de venta por ID: " + e.getMessage());
             e.printStackTrace();
@@ -105,7 +121,23 @@ public class DetalleVentaDAO {
         EntityManager em = null;
         try {
             em = EMF.createEntityManager();
-            return em.createQuery("SELECT d FROM DetalleVenta d", DetalleVenta.class).getResultList();
+            List<DetalleVenta> detalles = em.createQuery("SELECT d FROM DetalleVenta d", DetalleVenta.class).getResultList();
+            // Inicializar las relaciones lazy antes de cerrar el EntityManager
+            for (DetalleVenta d : detalles) {
+                if (d.getVenta() != null) {
+                    d.getVenta().getIdVenta();
+                    if (d.getVenta().getCliente() != null) {
+                        d.getVenta().getCliente().getNombreCliente();
+                    }
+                    if (d.getVenta().getUsuario() != null) {
+                        d.getVenta().getUsuario().getNombreUsuario();
+                    }
+                }
+                if (d.getProducto() != null) {
+                    d.getProducto().getNombreProducto();
+                }
+            }
+            return detalles;
         } catch (Exception e) {
             System.err.println("Error al obtener todos los detalles de venta: " + e.getMessage());
             e.printStackTrace();
@@ -121,9 +153,19 @@ public class DetalleVentaDAO {
         EntityManager em = null;
         try {
             em = EMF.createEntityManager();
-            return em.createQuery("SELECT d FROM DetalleVenta d WHERE d.venta.idVenta = :idVenta", DetalleVenta.class)
+            List<DetalleVenta> detalles = em.createQuery("SELECT d FROM DetalleVenta d WHERE d.venta.idVenta = :idVenta", DetalleVenta.class)
                     .setParameter("idVenta", idVenta)
                     .getResultList();
+            // Inicializar las relaciones lazy antes de cerrar el EntityManager
+            for (DetalleVenta d : detalles) {
+                if (d.getVenta() != null) {
+                    d.getVenta().getIdVenta();
+                }
+                if (d.getProducto() != null) {
+                    d.getProducto().getNombreProducto();
+                }
+            }
+            return detalles;
         } catch (Exception e) {
             System.err.println("Error al buscar detalles por venta: " + e.getMessage());
             e.printStackTrace();

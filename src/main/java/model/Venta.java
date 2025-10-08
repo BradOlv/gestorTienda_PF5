@@ -19,11 +19,11 @@ public class Venta implements Serializable {
     @Column(name = "idVenta")
     private int idVenta;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idCliente", nullable = false)
     private Cliente cliente;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idUsuario", nullable = false)
     private Usuario usuario;
     
