@@ -87,7 +87,7 @@ public class AdminLoginServlet extends HttpServlet {
                 transaction.commit();
 
                 // Redirigir al dashboard de administración
-                response.sendRedirect("pages/admin_dashboard.jsp");
+                response.sendRedirect("pages/menuPrincipal.jsp");
                 
             } else {
                 // Credenciales incorrectas
