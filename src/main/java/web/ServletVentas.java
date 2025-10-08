@@ -3,142 +3,193 @@ package web;
 import dao.VentasDAO;
 import model.Venta;
 import model.Cliente;
-import model.Usuario; 
+import model.Usuario;
+import model.Producto; 
+import model.DetalleVenta; 
 import dao.ClientesDAO; 
 import dao.UsuariosDAO; 
+import dao.ProductosDAO; 
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.ArrayList; 
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession; 
 
-/**
- *
- * @author Bradley Oliva
- */
 @WebServlet(name = "VentaServlet", urlPatterns = {"/VentaServlet"})
 public class ServletVentas extends HttpServlet {
 
     private final VentasDAO ventaDAO = new VentasDAO();
     private final ClientesDAO clienteDAO = new ClientesDAO();
-    private final UsuariosDAO usuarioDAO = new UsuariosDAO(); 
+    private final ProductosDAO productoDAO = new ProductosDAO(); 
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        request.setCharacterEncoding("UTF-8");
         
         String accion = request.getParameter("accion");
         if (accion == null) {
-            accion = "listar"; 
+            accion = "listar";
         }
-        
+
         switch (accion) {
-            case "agregar":
-                agregarVenta(request, response);
+            case "formVenta": 
+                mostrarFormularioVenta(request, response);
                 break;
-            case "editar":
-                formularioEditar(request, response);
+            case "crearVenta": 
+                crearVentaCompleta(request, response);
                 break;
-            case "actualizar":
-                actualizarVenta(request, response);
-                break;
-            case "eliminar":
-                eliminarVenta(request, response);
+            case "mostrarFactura": 
+                mostrarFactura(request, response);
                 break;
             case "listar":
                 listarVentas(request, response);
                 break;
-            case "formNuevo": // Para mostrar el formulario de agregar/crear
-                mostrarFormularioNuevo(request, response);
-                break;
             default:
-                listarVentas(request, response); 
+                listarVentas(request, response);
         }
     }
-
-    // --- Métodos de CRUD ---
     
-    protected void mostrarFormularioNuevo(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    // ***************************************************************
+    // --- LÓGICA DE COMPRA Y FACTURACIÓN ---
+    // ***************************************************************
+
+    protected void mostrarFormularioVenta(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Carga la lista de clientes y productos
         List<Cliente> clientes = clienteDAO.getAllClientes();
-        List<Usuario> usuarios = usuarioDAO.getAllUsuarios(); 
+        List<Producto> productos = productoDAO.getAllProductos();
+        
+        // --- LÍNEAS DE DEPURACIÓN ---
+        System.out.println("DEBUG: Clientes cargados: " + clientes.size()); 
+        System.out.println("DEBUG: Productos cargados: " + productos.size()); 
+        // --- FIN DEPURACIÓN ---
 
         request.setAttribute("listaClientes", clientes);
-        request.setAttribute("listaUsuarios", usuarios);
+        request.setAttribute("listaProductos", productos);
         
-        request.getRequestDispatcher("/pages/editarVenta.jsp").forward(request, response);
-    }
+        if (clientes.isEmpty() || productos.isEmpty()) {
+            // Manejo de error si no hay datos
+        }
+        
+        // RUTA CORRECTA: /pages/administracionCompra.jsp
+        request.getRequestDispatcher("/pages/administracionCompra.jsp").forward(request, response);
+    } 
     
-    protected void agregarVenta(HttpServletRequest solicitud, HttpServletResponse respuesta) throws ServletException, IOException {
-        int idCliente = Integer.parseInt(solicitud.getParameter("idCliente"));
-        int idUsuario = Integer.parseInt(solicitud.getParameter("idUsuario"));
-        BigDecimal totalVenta = new BigDecimal(solicitud.getParameter("totalVenta"));
-        String estadoVenta = solicitud.getParameter("estadoVenta");
+    protected void crearVentaCompleta(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
         
+        Usuario usuarioLoggeado = (Usuario) session.getAttribute("usuarioLoggeado"); 
+        
+        if (usuarioLoggeado == null) {
+            response.sendRedirect("pages/login.jsp?error=SesionExpirada");
+            return;
+        }
+        
+        String idClienteStr = request.getParameter("idCliente");
+        
+        if (idClienteStr == null || idClienteStr.isEmpty()) {
+            request.setAttribute("mensajeError", "Debe seleccionar un cliente.");
+            mostrarFormularioVenta(request, response);
+            return;
+        }
+        int idCliente = Integer.parseInt(idClienteStr);
+        int idUsuario = usuarioLoggeado.getIdUsuario(); 
+
+        String[] idsProducto = request.getParameterValues("idProducto");
+        String[] cantidades = request.getParameterValues("cantidad");
+        String[] precios = request.getParameterValues("precioUnitario");
+
+        if (idsProducto == null || idsProducto.length == 0) {
+            request.setAttribute("mensajeError", "Debe agregar productos a la compra.");
+            mostrarFormularioVenta(request, response); 
+            return;
+        }
+
         Cliente cliente = ventaDAO.getClienteReference(idCliente);
         Usuario usuario = ventaDAO.getUsuarioReference(idUsuario);
         
-        Venta nuevaVenta = new Venta(cliente, usuario, totalVenta, estadoVenta);
-        ventaDAO.saveVenta(nuevaVenta);
+        BigDecimal totalVenta = BigDecimal.ZERO;
+        List<DetalleVenta> detalles = new ArrayList<>();
         
-        respuesta.sendRedirect("VentaServlet?accion=listar");
-    }
-    
-    protected void formularioEditar(HttpServletRequest solicitud, HttpServletResponse respuesta) throws ServletException, IOException {
-        int idEditar = Integer.parseInt(solicitud.getParameter("id"));
-        Venta venta = ventaDAO.getVentaById(idEditar);
-        
-        List<Cliente> clientes = clienteDAO.getAllClientes();
-        List<Usuario> usuarios = usuarioDAO.getAllUsuarios(); 
-        
-        solicitud.setAttribute("venta", venta);
-        solicitud.setAttribute("listaClientes", clientes);
-        solicitud.setAttribute("listaUsuarios", usuarios);
-        
-        solicitud.getRequestDispatcher("/pages/editarVenta.jsp").forward(solicitud, respuesta);
-    }
-    
-    protected void actualizarVenta(HttpServletRequest solicitud, HttpServletResponse respuesta) throws ServletException, IOException {
-        int idActualizar = Integer.parseInt(solicitud.getParameter("idVenta"));
-        int idCliente = Integer.parseInt(solicitud.getParameter("idCliente"));
-        int idUsuario = Integer.parseInt(solicitud.getParameter("idUsuario"));
-        BigDecimal totalVenta = new BigDecimal(solicitud.getParameter("totalVenta"));
-        String estadoVenta = solicitud.getParameter("estadoVenta");
+        try {
+            // Construir los objetos DetalleVenta
+            for (int i = 0; i < idsProducto.length; i++) {
+                int idProd = Integer.parseInt(idsProducto[i]);
+                int cant = Integer.parseInt(cantidades[i]);
+                BigDecimal precioUnitario = new BigDecimal(precios[i]);
+                
+                Producto productoRef = productoDAO.getProductoById(idProd);
+                if (productoRef == null) continue;
 
-        Venta venta = ventaDAO.getVentaById(idActualizar);
-        
-        if (venta != null) {
-            Cliente cliente = ventaDAO.getClienteReference(idCliente);
-            Usuario usuario = ventaDAO.getUsuarioReference(idUsuario);
+                // Cálculo del subtotal y acumulación del totalVenta (asumiendo método getSubtotal en DetalleVenta)
+                DetalleVenta detalle = new DetalleVenta(null, productoRef, cant, precioUnitario);
+                detalles.add(detalle);
+                // Nota: Asumiendo que DetalleVenta tiene un método getSubtotal
+                totalVenta = totalVenta.add(detalle.getSubtotal());
+            }
+
+            Venta nuevaVenta = new Venta(cliente, usuario, totalVenta, "Completada");
             
-            venta.setCliente(cliente);
-            venta.setUsuario(usuario);
-            venta.setTotalVenta(totalVenta);
-            venta.setEstadoVenta(estadoVenta);
+            // Guardar Venta y Detalles (Lógica Transaccional en DAO)
+            Venta ventaGuardada = ventaDAO.guardarVentaCompleta(nuevaVenta, detalles);
+            
+            // --- INICIO DE LA CORRECCIÓN DE RUTA ---
+            request.setAttribute("idVenta", ventaGuardada.getIdVenta());
+            
+            // *** CORRECCIÓN: Se añade '/pages/' ***
+            request.getRequestDispatcher("/pages/redirectFactura.jsp").forward(request, response);
+            // --- FIN DE LA CORRECCIÓN DE RUTA ---
 
-            ventaDAO.updateVenta(venta);
+        } catch (Exception e) {
+            request.setAttribute("mensajeError", "Error al procesar la compra: " + e.getMessage());
+            e.printStackTrace();
+            mostrarFormularioVenta(request, response);
+        }
+    }
+    
+    protected void mostrarFactura(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String idVentaStr = request.getParameter("idVenta");
+        if (idVentaStr == null || idVentaStr.isEmpty()) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID de Venta es requerido.");
+            return;
         }
         
-        respuesta.sendRedirect("VentaServlet?accion=listar");
+        int idVenta = Integer.parseInt(idVentaStr);
+        
+        Venta venta = ventaDAO.getVentaById(idVenta); 
+        List<DetalleVenta> detalles = ventaDAO.getDetallesByVentaId(idVenta);
+        
+        if (venta == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Venta no encontrada.");
+            return;
+        }
+        
+        request.setAttribute("venta", venta);
+        request.setAttribute("detalles", detalles);
+        
+        // *** CORRECCIÓN: Se añade '/pages/' ***
+        request.getRequestDispatcher("/pages/facturaEmergente.jsp").forward(request, response);
     }
     
-    protected void eliminarVenta(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int idEliminar = Integer.parseInt(request.getParameter("id"));
-        ventaDAO.deleteVenta(idEliminar);
-        response.sendRedirect("VentaServlet?accion=listar");
-    }
+    // ***************************************************************
+    // --- MÉTODO CRUD (Mínimo necesario para que compile) ---
+    // ***************************************************************
     
     protected void listarVentas(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<Venta> listaVentas = ventaDAO.getAllVentas();
-        
-        request.setAttribute("listaVentas", listaVentas);
-        
-        request.getRequestDispatcher("/pages/administracionVentas.jsp").forward(request, response);
+        // Redirige al formulario de venta por defecto si no tienes una página de listado
+        mostrarFormularioVenta(request, response); 
     }
-    
+
+    // ***************************************************************
+    // --- MÉTODOS DOGET/DOPOST ---
+    // ***************************************************************
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

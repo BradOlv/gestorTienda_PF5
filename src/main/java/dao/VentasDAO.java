@@ -8,6 +8,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.NoResultException;
 import java.util.List;
+import model.DetalleVenta;
 
 public class VentasDAO {
 
@@ -125,5 +126,72 @@ public class VentasDAO {
     
     public Usuario getUsuarioReference(int id) {
         return usuarioDAO.getUsuarioById(id);
+    }
+    public Venta guardarVentaCompleta(Venta venta, List<DetalleVenta> detalles) {
+        EntityManager em = null;
+        try {
+            em = EMF.createEntityManager();
+            em.getTransaction().begin();
+
+            // 1. Persistir la Venta principal
+            em.persist(venta);
+            
+            // 2. Persistir cada DetalleVenta y actualizar el stock
+            for (DetalleVenta detalle : detalles) {
+                // Asignar la Venta (con ID generado) al DetalleVenta
+                detalle.setVenta(venta);
+                em.persist(detalle);
+                
+                // 3. Actualizar el stock del producto
+                model.Producto productoManaged = em.find(model.Producto.class, detalle.getProducto().getIdProducto());
+                if (productoManaged != null) {
+                    int nuevoStock = productoManaged.getStock() - detalle.getCantidad();
+                    if (nuevoStock < 0) {
+                         // Lanza una excepción si el stock es insuficiente
+                         throw new RuntimeException("Stock insuficiente para el producto: " + productoManaged.getNombreProducto());
+                    }
+                    productoManaged.setStock(nuevoStock);
+                    em.merge(productoManaged); // Actualiza el stock
+                } else {
+                     throw new RuntimeException("Producto no encontrado con ID: " + detalle.getProducto().getIdProducto());
+                }
+            }
+
+            em.getTransaction().commit();
+            return venta; // Retorna la venta con su ID
+        } catch (Exception e) {
+            if (em != null && em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            System.err.println("Error al guardar venta y detalles: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Error en la transacción de la venta. Se hizo rollback. Detalle: " + e.getMessage(), e);
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
+        }
+    }
+    
+    /**
+     * Obtiene los detalles de una venta específica junto con la información del producto.
+     */
+    public List<DetalleVenta> getDetallesByVentaId(Integer idVenta) {
+        EntityManager em = null;
+        try {
+            em = EMF.createEntityManager();
+            return em.createQuery(
+                "SELECT d FROM DetalleVenta d JOIN FETCH d.producto WHERE d.venta.idVenta = :idVenta", DetalleVenta.class)
+                .setParameter("idVenta", idVenta)
+                .getResultList();
+        } catch (Exception e) {
+            System.err.println("Error al obtener detalles de venta por ID: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Error obteniendo detalles de venta", e);
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
+        }
     }
 }
