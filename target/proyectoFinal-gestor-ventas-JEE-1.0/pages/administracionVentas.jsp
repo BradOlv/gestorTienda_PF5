@@ -93,7 +93,7 @@
             <div class="container d-flex justify-content-between align-items-center">
                 <h2 class="my-3 text-white" style="font-family: var(--font-georgia);">Administración de Ventas</h2>
                 <%-- Volver al Menú Admin --%>
-                <a href="${pageContext.request.contextPath}/pages/menuPrincipal.jsp" class="btn btn-sm btn-outline-light" style="font-family: var(--font-georgia); border-radius: 8px;">Volver al Menú</a>
+                <a href="pages/admin-dashboard.jsp" class="btn btn-sm btn-outline-light" style="font-family: var(--font-georgia); border-radius: 8px;">Volver al Panel</a>
             </div>
         </div>
 

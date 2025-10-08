@@ -274,8 +274,8 @@
             
             <div class="action-card card-admin">
                 <h3>Administración</h3>
-                <a href="${pageContext.request.contextPath}/UsuarioServlet?accion=listar" class="btn-action btn-admin">
-                    Gestionar Usuarios
+                <a href="${pageContext.request.contextPath}/pages/admin-login.jsp" class="btn-action btn-admin">
+                    Panel De Administracion
                 </a>
             </div>
             

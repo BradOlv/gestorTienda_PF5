@@ -27,21 +27,18 @@ public class LogoutServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         
         if (session != null) {
-            // Verificar si era administrador
-            boolean eraAdmin = "Admin".equals(session.getAttribute("rol"));
             
             // Invalidar la sesión
             session.invalidate();
             
-            // Redirigir según el tipo de usuario
-            if (eraAdmin) {
-                response.sendRedirect("pages/admin-login.jsp?logout=exitoso");
-            } else {
-                response.sendRedirect("pages/login.jsp?logout=exitoso");
-            }
+      
+            String contextPath = request.getContextPath();
+            response.sendRedirect(contextPath + "/pages/menuPrincipal.jsp?logout=exitoso");
+            
         } else {
-            // Si no había sesión, redirigir al inicio
-            response.sendRedirect("index.jsp");
+            // Si no había sesión, redirigir al menú principal de todas formas
+            String contextPath = request.getContextPath();
+            response.sendRedirect(contextPath + "/menuPrincipal.jsp");
         }
     }
 
