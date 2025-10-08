@@ -166,8 +166,8 @@
         </style>
     </head>
     <body>
-        <a href="../index.jsp" class="back-button">
-            <i class="bi bi-arrow-left"></i> Volver al Inicio
+        <a href="${pageContext.request.contextPath}/menuPrincipal.jsp">
+            <i class="bi bi-arrow-left"></i> Regresar al Menú Principal
         </a>
 
         <div class="admin-container">

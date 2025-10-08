@@ -59,8 +59,8 @@ public class AdminLoginServlet extends HttpServlet {
             try {
                 // Buscar el usuario por email
                 usuario = entityManager.createQuery("SELECT u FROM Usuario u WHERE u.emailUsuario = :email", Usuario.class)
-                                     .setParameter("email", email)
-                                     .getSingleResult();
+                            .setParameter("email", email)
+                            .getSingleResult();
             } catch (NoResultException e) {
                 // Usuario no encontrado
                 response.sendRedirect("pages/admin-login.jsp?error=no_encontrado");
@@ -86,8 +86,7 @@ public class AdminLoginServlet extends HttpServlet {
 
                 transaction.commit();
 
-                // Redirigir al dashboard de administración
-                response.sendRedirect("pages/menuPrincipal.jsp");
+                response.sendRedirect("pages/admin-dashboard.jsp");
                 
             } else {
                 // Credenciales incorrectas
