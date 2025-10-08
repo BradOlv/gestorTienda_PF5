@@ -77,24 +77,24 @@
         </style>
     </head>
     
-     <body>
-        <div class="titulo-bg">
-            <div class="container d-flex justify-content-between align-items-center">
-                <h2 class="my-3 text-white" style="font-family: var(--font-georgia);">Administración de Usuarios</h2>
-                <%-- Se asume que menuPrincipal.jsp está en la carpeta "pages" --%>
-                <a href="pages/menuPrincipal.jsp" class="btn btn-sm btn-outline-light" style="font-family: var(--font-georgia); border-radius: 8px;">Volver al Menú</a>
-            </div>
-        </div>
+      <body>
+        <div class="titulo-bg">
+            <div class="container d-flex justify-content-between align-items-center">
+                <h2 class="my-3 text-white" style="font-family: var(--font-georgia);">Administración de Usuarios</h2>
+                <%-- Se asume que menuPrincipal.jsp está en la carpeta "pages" --%>
+                <a href="pages/menuPrincipal.jsp" class="btn btn-sm btn-outline-light" style="font-family: var(--font-georgia); border-radius: 8px;">Volver al Menú</a>
+            </div>
+        </div>
 
-        <div class="container my-5">
-            <div class="row mb-4">
-                <div class="col-md-12">
-                    <%-- Enlace que llama al Servlet con acción 'editar' e id=0 para mostrar el formulario vacío (Agregar) --%>
-                    <a href="UsuarioServlet?accion=editar&id=0" class="btn btn-custom-primary">
-                        Agregar Nuevo Usuario
-                    </a>
-                </div>
-            </div>
+        <div class="container my-5">
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <%-- Enlace que llama al Servlet con acción 'editar' e id=0 para mostrar el formulario vacío (Agregar) --%>
+                    <a href="UsuarioServlet?accion=editar&id=0" class="btn btn-custom-primary">
+                        Agregar Nuevo Usuario
+                    </a>
+                </div>
+            </div>
 
             <%-- TABLA DE USUARIOS --%>
             <div class="table-responsive">

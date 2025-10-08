@@ -69,7 +69,7 @@ public class ServletVentas extends HttpServlet {
         request.setAttribute("listaClientes", clientes);
         request.setAttribute("listaUsuarios", usuarios);
         
-        request.getRequestDispatcher("/pages/agregarVenta.jsp").forward(request, response);
+        request.getRequestDispatcher("/pages/editarVenta.jsp").forward(request, response);
     }
     
     protected void agregarVenta(HttpServletRequest solicitud, HttpServletResponse respuesta) throws ServletException, IOException {
