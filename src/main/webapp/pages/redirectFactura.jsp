@@ -4,7 +4,7 @@
     Author     : Bradley Oliva
 --%>
 
-<%-- /redirectFactura.jsp --%>
+<%-- /pages/redirectFactura.jsp --%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%
     // Recupera el ID de Venta que fue pasado como atributo desde el Servlet
@@ -26,8 +26,9 @@
         // 1. Abre la factura en una nueva pestaña
         window.open('VentaServlet?accion=mostrarFactura&idVenta=<%= idVenta %>', '_blank');
         
-        // 2. Redirige la ventana principal al formulario de venta
-        window.location.href='VentaServlet?accion=formVenta';
+        // 2. CORRECCIÓN: Redirige la ventana principal a la lista de ventas.
+        // Esto evita que la página se quede en el formulario de compra vacío.
+        window.location.href='VentaServlet?accion=listar'; 
     </script>
     <p>La factura se está abriendo en una nueva ventana. Redirigiendo...</p>
 </body>

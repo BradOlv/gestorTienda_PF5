@@ -12,8 +12,8 @@
         <properties>
             <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
             <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/gestorVentasPF5?useSSL=false&amp;allowPublicKeyRetrieval=true"/>
-            <property name="javax.persistence.jdbc.user" value="admin"/>
-            <property name="javax.persistence.jdbc.password" value="kinal123"/>
+            <property name="javax.persistence.jdbc.user" value="quintom"/>
+            <property name="javax.persistence.jdbc.password" value="admin"/>
             
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL8Dialect"/>
             <property name="hibernate.show_sql" value="true"/>

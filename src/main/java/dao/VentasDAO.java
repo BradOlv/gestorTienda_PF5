@@ -14,9 +14,10 @@ public class VentasDAO {
 
     private static final EntityManagerFactory EMF = Persistence.createEntityManagerFactory("libreriaPU");
     private final ClientesDAO clienteDAO = new ClientesDAO();
-    private final UsuariosDAO usuarioDAO = new UsuariosDAO();
+    private final UsuariosDAO usuarioDAO = new UsuariosDAO(); 
 
     public void saveVenta(Venta venta) {
+        // ... (Tu código actual para saveVenta es correcto) ...
         EntityManager em = null;
         try {
             em = EMF.createEntityManager();
@@ -37,12 +38,16 @@ public class VentasDAO {
         }
     }
     
+    /**
+     * Obtiene una venta por ID, asegurando que el Cliente y el Usuario sean cargados (FETCH JOIN).
+     */
     public Venta getVentaById(Integer id) {
         EntityManager em = null;
         try {
             em = EMF.createEntityManager();
+            // 💡 CORRECCIÓN: Se usa JOIN FETCH para cargar Cliente y Usuario en una sola consulta
             return em.createQuery(
-                "SELECT v FROM Venta v JOIN FETCH v.cliente JOIN FETCH v.usuario WHERE v.idVenta = :id", Venta.class)
+                "SELECT v FROM Venta v JOIN FETCH v.cliente c JOIN FETCH v.usuario u WHERE v.idVenta = :id", Venta.class)
                 .setParameter("id", id)
                 .getSingleResult();
 
@@ -59,6 +64,7 @@ public class VentasDAO {
         }
     }
     
+    // ... (updateVenta se mantiene igual) ...
     public void updateVenta(Venta venta) {
         EntityManager em = null;
         try {
@@ -80,13 +86,21 @@ public class VentasDAO {
         }
     }
     
+    // ... (deleteVenta se mantiene igual, ya lo habías corregido) ...
     public void deleteVenta(Integer id) {
         EntityManager em = null;
         try {
             em = EMF.createEntityManager();
             em.getTransaction().begin();
+            
             Venta venta = em.find(Venta.class, id);
+            
             if (venta != null) {
+                // Eliminar los detalles primero (por clave foránea)
+                em.createQuery("DELETE FROM DetalleVenta d WHERE d.venta.idVenta = :idVenta")
+                    .setParameter("idVenta", id)
+                    .executeUpdate();
+                
                 em.remove(venta);
             }
             em.getTransaction().commit();
@@ -104,10 +118,14 @@ public class VentasDAO {
         }
     }
     
+    /**
+     * Obtiene todas las ventas, asegurando que el Cliente y el Usuario sean cargados (FETCH JOIN).
+     */
     public List<Venta> getAllVentas() {
         EntityManager em = null;
         try {
             em = EMF.createEntityManager();
+            // 💡 CORRECCIÓN: Se usa JOIN FETCH para cargar Cliente y Usuario en una sola consulta
             return em.createQuery("SELECT v FROM Venta v JOIN FETCH v.cliente JOIN FETCH v.usuario", Venta.class).getResultList();
         } catch (Exception e) {
             System.err.println("Error al obtener todas las ventas: " + e.getMessage());
@@ -119,7 +137,9 @@ public class VentasDAO {
             }
         }
     }
-        
+    
+    // ... (El resto de métodos: getClienteReference, getUsuarioReference, guardarVentaCompleta, getDetallesByVentaId se mantienen igual) ...
+
     public Cliente getClienteReference(int id) {
         return clienteDAO.getClienteById(id);
     }
@@ -127,6 +147,7 @@ public class VentasDAO {
     public Usuario getUsuarioReference(int id) {
         return usuarioDAO.getUsuarioById(id);
     }
+    
     public Venta guardarVentaCompleta(Venta venta, List<DetalleVenta> detalles) {
         EntityManager em = null;
         try {
@@ -147,13 +168,12 @@ public class VentasDAO {
                 if (productoManaged != null) {
                     int nuevoStock = productoManaged.getStock() - detalle.getCantidad();
                     if (nuevoStock < 0) {
-                         // Lanza una excepción si el stock es insuficiente
-                         throw new RuntimeException("Stock insuficiente para el producto: " + productoManaged.getNombreProducto());
+                           throw new RuntimeException("Stock insuficiente para el producto: " + productoManaged.getNombreProducto());
                     }
                     productoManaged.setStock(nuevoStock);
                     em.merge(productoManaged); // Actualiza el stock
                 } else {
-                     throw new RuntimeException("Producto no encontrado con ID: " + detalle.getProducto().getIdProducto());
+                       throw new RuntimeException("Producto no encontrado con ID: " + detalle.getProducto().getIdProducto());
                 }
             }
 
@@ -173,9 +193,6 @@ public class VentasDAO {
         }
     }
     
-    /**
-     * Obtiene los detalles de una venta específica junto con la información del producto.
-     */
     public List<DetalleVenta> getDetallesByVentaId(Integer idVenta) {
         EntityManager em = null;
         try {

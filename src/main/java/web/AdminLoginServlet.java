@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package web;
 
 import java.io.IOException;
@@ -19,10 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-/**
- *
- * @author Kevin
- */
 @WebServlet("/admin-login")
 public class AdminLoginServlet extends HttpServlet {
 
@@ -39,15 +31,27 @@ public class AdminLoginServlet extends HttpServlet {
 
         EntityManager entityManager = null;
         EntityTransaction transaction = null;
+        
+        // 🚀 SOLUCIÓN AL ERROR: Declarar redirectUrl fuera del try
+        String redirectUrl = null; 
 
         try {
             // Recuperar los datos del formulario
             String email = request.getParameter("email");
             String contrasena = request.getParameter("contrasena");
+            
+            // ASIGNACIÓN: Solo asignar el valor aquí
+            redirectUrl = request.getParameter("redirect");
+            String contextPath = request.getContextPath(); // Para redirecciones absolutas
+
 
             // Validación básica de campos
             if (email == null || email.isEmpty() || contrasena == null || contrasena.isEmpty()) {
-                response.sendRedirect("pages/admin-login.jsp?error=campos_vacios");
+                String errorRedirect = "pages/admin-login.jsp?error=campos_vacios";
+                if (redirectUrl != null && !redirectUrl.isEmpty()) {
+                    errorRedirect += "&redirect=" + redirectUrl;
+                }
+                response.sendRedirect(errorRedirect);
                 return;
             }
 
@@ -59,11 +63,14 @@ public class AdminLoginServlet extends HttpServlet {
             try {
                 // Buscar el usuario por email
                 usuario = entityManager.createQuery("SELECT u FROM Usuario u WHERE u.emailUsuario = :email", Usuario.class)
-                            .setParameter("email", email)
-                            .getSingleResult();
+                             .setParameter("email", email)
+                             .getSingleResult();
             } catch (NoResultException e) {
-                // Usuario no encontrado
-                response.sendRedirect("pages/admin-login.jsp?error=no_encontrado");
+                String errorRedirect = "pages/admin-login.jsp?error=no_encontrado";
+                if (redirectUrl != null && !redirectUrl.isEmpty()) {
+                    errorRedirect += "&redirect=" + redirectUrl;
+                }
+                response.sendRedirect(errorRedirect);
                 return;
             }
 
@@ -72,26 +79,42 @@ public class AdminLoginServlet extends HttpServlet {
                 
                 // VERIFICAR QUE SEA ADMINISTRADOR
                 if (!RolUsuario.Admin.equals(usuario.getRol())) {
-                    response.sendRedirect("pages/admin-login.jsp?error=no_autorizado");
+                    String errorRedirect = "pages/admin-login.jsp?error=no_autorizado";
+                    if (redirectUrl != null && !redirectUrl.isEmpty()) {
+                        errorRedirect += "&redirect=" + redirectUrl;
+                    }
+                    response.sendRedirect(errorRedirect);
                     return;
                 }
                 
                 // Si es admin y las credenciales son correctas
                 HttpSession session = request.getSession();
+                
+                // Configuración de la sesión
+                session.setAttribute("usuarioLoggeado", usuario); 
                 session.setAttribute("idUsuario", usuario.getIdUsuario());
                 session.setAttribute("nombre", usuario.getNombreUsuario());
                 session.setAttribute("rol", usuario.getRol().toString());
                 session.setAttribute("nit", usuario.getNit());
-                session.setAttribute("esAdmin", true); // Flag adicional para verificaciones
+                session.setAttribute("esAdmin", true); 
 
                 transaction.commit();
 
-                response.sendRedirect("pages/admin-dashboard.jsp");
+                // 🚀 REDIRECCIÓN CLAVE
+                if (redirectUrl != null && !redirectUrl.isEmpty()) {
+                    response.sendRedirect(contextPath + redirectUrl);
+                } else {
+                    response.sendRedirect("pages/admin-dashboard.jsp");
+                }
                 
             } else {
-                // Credenciales incorrectas
+                // Credenciales incorrectas - Preservar 'redirect'
                 transaction.rollback();
-                response.sendRedirect("pages/admin-login.jsp?error=credenciales");
+                String errorRedirect = "pages/admin-login.jsp?error=credenciales";
+                if (redirectUrl != null && !redirectUrl.isEmpty()) {
+                    errorRedirect += "&redirect=" + redirectUrl;
+                }
+                response.sendRedirect(errorRedirect);
             }
 
         } catch (Exception e) {
@@ -99,7 +122,12 @@ public class AdminLoginServlet extends HttpServlet {
             if (transaction != null && transaction.isActive()) {
                 transaction.rollback();
             }
-            response.sendRedirect("pages/admin-login.jsp?error=error_servidor");
+            // Error de servidor - Usa redirectUrl (ya accesible)
+            String errorRedirect = "pages/admin-login.jsp?error=error_servidor";
+            if (redirectUrl != null && !redirectUrl.isEmpty()) {
+                errorRedirect += "&redirect=" + redirectUrl;
+            }
+            response.sendRedirect(errorRedirect);
         } finally {
             if (entityManager != null && entityManager.isOpen()) {
                 entityManager.close();

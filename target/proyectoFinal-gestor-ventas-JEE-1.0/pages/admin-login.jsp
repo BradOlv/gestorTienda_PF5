@@ -1,7 +1,7 @@
 <%-- 
     Document    : admin-login
-    Created on : 7/10/2025
-    Author     : Kevin
+    Created on  : 7/10/2025
+    Author      : Kevin
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -17,8 +17,8 @@
         <style>
             :root {
                 /* Colores de tu tema administrativo */
-                --color-principal: rgb(48, 87, 118);      /* Azul (para fondos principales/botones) */
-                --color-secundario: rgb(255, 170, 102);   /* Naranja suave (para bordes de foco) */
+                --color-principal: rgb(48, 87, 118);       /* Azul (para fondos principales/botones) */
+                --color-secundario: rgb(255, 170, 102);    /* Naranja suave (para bordes de foco) */
                 --color-secundario-foco: rgb(255, 140, 70); /* Naranja fuerte */
                 --font-georgia: "Georgia", serif;
             }
@@ -166,7 +166,7 @@
         </style>
     </head>
     <body>
-        <a href="${pageContext.request.contextPath}/menuPrincipal.jsp">
+        <a href="${pageContext.request.contextPath}/menuPrincipal.jsp" class="back-button">
             <i class="bi bi-arrow-left"></i> Regresar al Menú Principal
         </a>
 
@@ -182,6 +182,9 @@
             </div>
 
             <%
+                // **CLAVE 1: Recupera el parámetro 'redirect' de la URL (si viene del menú Vender).**
+                String redirectUrl = request.getParameter("redirect");
+            
                 String error = request.getParameter("error");
                 if (error != null) {
                     String mensaje = "";
@@ -207,6 +210,12 @@
             %>
 
             <form method="post" action="${pageContext.request.contextPath}/admin-login">
+                
+                <%-- **CLAVE 2: Si existe el destino de redirección, lo pasamos oculto en el formulario POST.** --%>
+                <% if (redirectUrl != null) { %>
+                    <input type="hidden" name="redirect" value="<%= redirectUrl %>">
+                <% } %>
+                
                 <label for="email">Correo de Administrador:</label>
                 <input type="email" name="email" id="email" placeholder="admin@gestiontienda.com" required>
 

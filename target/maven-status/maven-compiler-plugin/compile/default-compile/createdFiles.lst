@@ -4,6 +4,7 @@ model\Venta.class
 LoginServlet.class
 model\Producto.class
 dao\UsuariosDAO.class
+web\AdminLoginServlet.class
 model\Usuario.class
 web\ServletDetallesVentas.class
 web\ServletVentas.class
@@ -11,6 +12,7 @@ model\RolUsuario.class
 web\ServletClientes.class
 dao\ProductosDAO.class
 dao\VentasDAO.class
+web\LogoutServlet.class
 web\ServletUsuarios.class
 dao\ClientesDAO.class
 model\Cliente.class

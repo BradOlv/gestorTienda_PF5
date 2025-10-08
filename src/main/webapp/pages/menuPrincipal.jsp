@@ -1,4 +1,6 @@
+<%-- /menuPrincipal.jsp --%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="model.Usuario" %>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -10,7 +12,7 @@
     <style>
         /* INICIO DE ESTILOS CSS INTEGRADOS */
         body {
-            background: #f8f9fa; 
+            background: #f8f9fa;  
             color: #343a40;
             font-family: 'Montserrat', Arial, sans-serif;
             margin: 0;
@@ -22,13 +24,13 @@
         
         /* --- HEADER --- */
         .header-relojeria {
-            background: #343a40; 
+            background: #343a40;  
             color: #ffffff;
             padding: 18px 60px;
             display: flex;
             justify-content: center;
             align-items: center;
-            border-bottom: 2px solid #007bff; 
+            border-bottom: 2px solid #007bff;  
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         .header-relojeria h1 {
@@ -178,15 +180,15 @@
         /* FONDOS INDIVIDUALES PARA CADA TARJETA */
         /* Context Root: /proyectofinal_PFS */
         .card-login {
-            background-image: url('/proyectofinal_PFS/image/login.jpg'); 
+            background-image: url('${pageContext.request.contextPath}/image/login.jpg');  
         }
 
         .card-register {
-            background-image: url('/proyectofinal_PFS/image/register.jpg');
+            background-image: url('${pageContext.request.contextPath}/image/register.jpg');
         }
 
         .card-admin {
-            background-image: url('/proyectofinal_PFS/image/admin.jpg'); 
+            background-image: url('${pageContext.request.contextPath}/image/admin.jpg');  
         }
 
 
@@ -205,7 +207,7 @@
         /* --- RESPONSIVE --- */
         @media (max-width: 992px) {
             .action-grid {
-                grid-template-columns: repeat(2, 1fr); 
+                grid-template-columns: repeat(2, 1fr);  
                 gap: 25px;
             }
         }
@@ -242,7 +244,7 @@
 <body>
     
     <header class="header-relojeria">
-        <h1>Relojería Bradley</h1>
+        <h1>Relojería B Y K</h1>
     </header>
 
     <section class="banner-principal">
@@ -255,20 +257,48 @@
         </div>
     </section>
     
+        
     <div class="main-content">
         <div class="action-grid">
             
             <div class="action-card card-login">
-                <h3>Iniciar Sesión</h3>
-                <a href="${pageContext.request.contextPath}/pages/login.jsp" class="btn-action">
+                <h3>login cliente</h3>
+                <a href="${pageContext.request.contextPath}/pages/admin-login.jsp" class="btn-action">
                     Acceder
                 </a>
             </div>
             
+           <%
+                // 1. Obtener el path base del proyecto
+                String contextPath = request.getContextPath();
+                
+                // 2. Verificar la sesión
+                Usuario usuarioLoggeado = (Usuario) session.getAttribute("usuarioLoggeado");
+                
+                // 3. Generar la URL basada en el estado de la sesión
+                String urlVenta;
+                String textoBoton;
+                
+                // DESTINO DESEADO DESPUÉS DEL LOGIN:
+                String destinoVenta = "/VentaServlet?accion=formVenta"; 
+
+                if (usuarioLoggeado != null) {
+                    // Opción 1: Loggeado -> Ir directamente al Servlet de venta
+                    urlVenta = contextPath + destinoVenta;
+                    textoBoton = "Comenzar Venta";
+                } else {
+                    // Opción 2: NO Loggeado -> Redirigir al login, indicando el destino.
+                    // **CLAVE:** Codificar el destino para que el login pueda pasarlo.
+                    String encodedDestinoVenta = java.net.URLEncoder.encode(destinoVenta, "UTF-8");
+                    urlVenta = contextPath + "/pages/admin-login.jsp?redirect=" + encodedDestinoVenta;
+                    textoBoton = "Acceder para Vender";
+                }
+            %>
+
             <div class="action-card card-register">
-                <h3>Registrarse</h3>
-                <a href="${pageContext.request.contextPath}/pages/registro.jsp" class="btn-action">
-                    Crear Cuenta
+                <h3>Nueva Venta (Compra)</h3>
+                <a href="<%= urlVenta %>" class="btn-action">
+                    <%= textoBoton %>
                 </a>
             </div>
             
@@ -281,6 +311,7 @@
             
         </div>
     </div>
+
 
     <footer class="footer-relojeria">
         © 2025 Relojería Bradley. Todos los derechos reservados.

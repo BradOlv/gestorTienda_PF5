@@ -8,8 +8,8 @@
         <property name="serverName" value="127.0.0.1"/>
         <property name="portNumber" value="3306"/>
         <property name="databaseName" value="gestorVentasPF5"/>
-        <property name="User" value="admin"/>
-        <property name="Password" value="kinal123"/>
+        <property name="User" value="quintom"/>
+        <property name="Password" value="admin"/>
         <property name="URL" value="jdbc:mysql://127.0.0.1:3306/gestorVentasPF5?useSSL=false"/>
         <property name="driverClass" value="org.gjt.mm.mysql.Driver"/>
     </jdbc-connection-pool>
