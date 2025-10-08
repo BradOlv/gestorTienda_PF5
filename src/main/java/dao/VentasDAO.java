@@ -6,18 +6,14 @@ import model.Usuario;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import java.util.List;
 import javax.persistence.NoResultException;
+import java.util.List;
 
-/**
- *
- * @author Bradley Oliva
- */
 public class VentasDAO {
 
     private static final EntityManagerFactory EMF = Persistence.createEntityManagerFactory("libreriaPU");
-    private final ClientesDAO clienteDAO = new ClientesDAO(); 
-    private final UsuariosDAO usuarioDAO = new UsuariosDAO(); 
+    private final ClientesDAO clienteDAO = new ClientesDAO();
+    private final UsuariosDAO usuarioDAO = new UsuariosDAO();
 
     public void saveVenta(Venta venta) {
         EntityManager em = null;
@@ -44,7 +40,13 @@ public class VentasDAO {
         EntityManager em = null;
         try {
             em = EMF.createEntityManager();
-            return em.find(Venta.class, id);
+            return em.createQuery(
+                "SELECT v FROM Venta v JOIN FETCH v.cliente JOIN FETCH v.usuario WHERE v.idVenta = :id", Venta.class)
+                .setParameter("id", id)
+                .getSingleResult();
+
+        } catch (NoResultException e) {
+            return null;
         } catch (Exception e) {
             System.err.println("Error al buscar venta por ID: " + e.getMessage());
             e.printStackTrace();
@@ -105,7 +107,7 @@ public class VentasDAO {
         EntityManager em = null;
         try {
             em = EMF.createEntityManager();
-            return em.createQuery("SELECT v FROM Venta v", Venta.class).getResultList();
+            return em.createQuery("SELECT v FROM Venta v JOIN FETCH v.cliente JOIN FETCH v.usuario", Venta.class).getResultList();
         } catch (Exception e) {
             System.err.println("Error al obtener todas las ventas: " + e.getMessage());
             e.printStackTrace();
@@ -122,6 +124,6 @@ public class VentasDAO {
     }
     
     public Usuario getUsuarioReference(int id) {
-        return usuarioDAO.getUsuarioById(id); 
+        return usuarioDAO.getUsuarioById(id);
     }
 }
